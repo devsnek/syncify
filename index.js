@@ -8,23 +8,31 @@ const {
 function wait(promise) {
   let state;
   let result;
+
   const fn = () => {
     const details = getPromiseDetails(promise);
     if (details === undefined) {
+      state = kFulfilled;
       result = promise;
       return false;
     }
-    [state, result] = details;
+    state = details[0];
+    result = details[1];
     return state === kPending;
   };
-  while (fn()) {
-    process._tickDomainCallback();
-    binding.run();
-  }
-  if (state === undefined || state === kFulfilled)
+
+  while (fn())
+    wait.run();
+
+  if (state === kFulfilled)
     return result;
   else
     throw result;
 }
+
+wait.run = () => {
+  process._tickDomainCallback();
+  binding.run();
+};
 
 module.exports = wait;

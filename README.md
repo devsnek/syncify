@@ -1,5 +1,7 @@
 # syncify
 
+(this is not something you should use in prod)
+
 ```js
 const syncify = require('@snek/syncify');
 

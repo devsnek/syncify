@@ -2,7 +2,7 @@
   "name": "@snek/syncify",
   "version": "0.0.1",
   "main": "index.js",
-  "description": "a small and fast deasync library",
+  "description": "a small and fast syncification library",
   "author": "snek <me@gus.host>",
   "license": "MIT",
   "homepage": "https://github.com/devsnek/syncify#readme",

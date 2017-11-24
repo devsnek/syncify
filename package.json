@@ -1,0 +1,25 @@
+{
+  "name": "@snek/deasync",
+  "version": "0.0.1",
+  "main": "index.js",
+  "description": "a small and fast deasync library",
+  "author": "snek <me@gus.host>",
+  "license": "MIT",
+  "homepage": "https://github.com/devsnek/deasync#readme",
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "gypfile": true,
+  "dependencies": {
+    "bindings": "^1.3.0",
+    "node-addon-api": "^1.1.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devsnek/deasync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devsnek/deasync/issues"
+  }
+}

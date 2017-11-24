@@ -9,14 +9,19 @@ function wait(promise) {
   let state;
   let result;
   const fn = () => {
-    [state, result] = getPromiseDetails(promise);
+    const details = getPromiseDetails(promise);
+    if (details === undefined) {
+      result = promise;
+      return false;
+    }
+    [state, result] = details;
     return state === kPending;
   };
   while (fn()) {
     process._tickDomainCallback();
     binding.run();
   }
-  if (state === kFulfilled)
+  if (state === undefined || state === kFulfilled)
     return result;
   else
     throw result;

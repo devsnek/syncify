@@ -1,10 +1,10 @@
 {
   "targets": [
     {
-      "target_name": "deasync",
+      "target_name": "uv_run_once",
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
-      "sources": [ "deasync.cc" ],
+      "sources": [ "uv_run_once.cc" ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"
       ],

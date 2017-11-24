@@ -1,11 +1,11 @@
 {
-  "name": "@snek/deasync",
+  "name": "@snek/syncify",
   "version": "0.0.1",
   "main": "index.js",
   "description": "a small and fast deasync library",
   "author": "snek <me@gus.host>",
   "license": "MIT",
-  "homepage": "https://github.com/devsnek/deasync#readme",
+  "homepage": "https://github.com/devsnek/syncify#readme",
   "scripts": {
     "install": "node-gyp rebuild"
   },
@@ -17,9 +17,9 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devsnek/deasync.git"
+    "url": "git+https://github.com/devsnek/syncify.git"
   },
   "bugs": {
-    "url": "https://github.com/devsnek/deasync/issues"
+    "url": "https://github.com/devsnek/syncify/issues"
   }
 }

@@ -1,17 +1,17 @@
-# deasync
+# syncify
 
 ```js
-const deasync = require('deasync');
+const syncify = require('@snek/syncify');
 
 const p0 = new Promise((r) => {
   setTimeout(() => r('works'), 1000);
 });
 
 // logs `'works'`
-console.log(deasync(p0));
+console.log(syncify(p0));
 
 const p1 = Promise.reject(new Error('aaaa'));
 
 // throws
-deasync(p1);
+syncify(p1);
 ```

@@ -1,11 +1,11 @@
-const binding = require('bindings')('deasync');
+const binding = require('bindings')('uv_run_once');
 const {
   getPromiseDetails,
   kPending,
   kFulfilled,
 } = process.binding('util');
 
-function wait(promise) {
+function syncify(promise) {
   let state;
   let result;
 
@@ -22,7 +22,7 @@ function wait(promise) {
   };
 
   while (fn())
-    wait.run();
+    syncify.uvRunOnce();
 
   if (state === kFulfilled)
     return result;
@@ -30,9 +30,9 @@ function wait(promise) {
     throw result;
 }
 
-wait.run = () => {
+syncify.uvRunOnce = () => {
   process._tickDomainCallback();
   binding.run();
 };
 
-module.exports = wait;
+module.exports = syncify;

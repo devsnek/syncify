@@ -11,4 +11,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   return exports;
 }
 
-NODE_API_MODULE(deasync, Init)
+NODE_API_MODULE(uv_run_once, Init)

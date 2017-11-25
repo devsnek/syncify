@@ -1,11 +1,18 @@
+const tap = require('tap');
 const syncify = require('.');
+const util = require('util');
+const setTimeoutAsync = util.promisify(setTimeout);
 
-const p0 = new Promise((r) => {
-  setTimeout(() => r('works'), 1000);
-}).then((r) => r);
+tap.plan(3);
 
-console.log(syncify(p0));
+tap.type(syncify, 'function', 'is a function');
 
-const p1 = Promise.reject(new Error('aaaa'));
+const start = Date.now();
+syncify(setTimeoutAsync(1000));
+tap.ok(Date.now() - start >= 1000, 'waits for the promise to resolve');
 
-syncify(p1);
+tap.throws(() => syncify(Promise.reject(new Error('this is an error'))),
+  'this is an error', 'throws when the promise rejects');
+
+tap.end();
+

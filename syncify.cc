@@ -37,13 +37,17 @@ void IsPromise(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   info.GetReturnValue().Set(info[0]->IsPromise());
 }
 
+void NanSetProperty(v8::Local<v8::Object> recv, const char* name, v8::Local<v8::Value> value) {
+  recv->Set(Nan::New(name).ToLocalChecked(), value);
+}
+
 void Init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
   Nan::SetMethod(exports, "setTickCallback", SetTickCallback);
   Nan::SetMethod(exports, "loop", Loop);
   Nan::SetMethod(exports, "isPromise", IsPromise);
-  exports->Set(Nan::New("kPending").ToLocalChecked(), Nan::New(v8::Promise::kPending));
-  exports->Set(Nan::New("kFulfilled").ToLocalChecked(), Nan::New(v8::Promise::kFulfilled));
-  exports->Set(Nan::New("kRejected").ToLocalChecked(), Nan::New(v8::Promise::kRejected));
+  NanSetProperty(exports, "kPending", Nan::New(v8::Promise::kPending));
+  NanSetProperty(exports, "kFulfilled", Nan::New(v8::Promise::kFulfilled));
+  NanSetProperty(exports, "kRejected", Nan::New(v8::Promise::kRejected));
 }
 
 NODE_MODULE(syncify, Init)

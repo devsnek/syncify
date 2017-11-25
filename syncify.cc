@@ -1,18 +1,25 @@
 #include <nan.h>
 #include <uv.h>
 
+Nan::Callback tickCallback;
+
+void SetTickCallback(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  tickCallback.SetFunction(info[0].As<v8::Function>());
+}
+
 void Loop(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   auto isolate = info.GetIsolate();
   
   v8::Local<v8::Array> ret = v8::Array::New(isolate, 2);
+  info.GetReturnValue().Set(ret);
 
   if (!info[0]->IsPromise()) {
-    info.GetReturnValue().Set(ret);
+    ret->Set(0, v8::Integer::New(isolate, v8::Promise::kFulfilled));
+    ret->Set(1, info[0]);
     return;
   }
   
   v8::Local<v8::Promise> promise = info[0].As<v8::Promise>();
-  Nan::Callback tickCallback(info[1].As<v8::Function>());
 
   uv_loop_t* loop = uv_default_loop();
   int state = promise->State();
@@ -24,8 +31,6 @@ void Loop(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
   ret->Set(0, v8::Integer::New(isolate, state));
   ret->Set(1, promise->Result());
-
-  info.GetReturnValue().Set(ret);
 }
 
 void IsPromise(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -33,6 +38,7 @@ void IsPromise(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 }
 
 void Init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
+  Nan::SetMethod(exports, "setTickCallback", SetTickCallback);
   Nan::SetMethod(exports, "loop", Loop);
   Nan::SetMethod(exports, "isPromise", IsPromise);
   exports->Set(Nan::New("kPending").ToLocalChecked(), Nan::New(v8::Promise::kPending));

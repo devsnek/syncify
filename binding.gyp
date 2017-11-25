@@ -1,12 +1,12 @@
 {
   "targets": [
     {
-      "target_name": "uv_run_once",
+      "target_name": "syncify",
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
-      "sources": [ "uv_run_once.cc" ],
+      "sources": [ "syncify.cc" ],
       "include_dirs": [
-        "<!@(node -p \"require('node-addon-api').include\")"
+        "<!@(node -p \"require('nan')\")"
       ],
       'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ],
     }

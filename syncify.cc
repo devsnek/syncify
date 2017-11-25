@@ -14,9 +14,10 @@ void Loop(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   v8::Local<v8::Promise> promise = info[0].As<v8::Promise>();
   Nan::Callback tickCallback(info[1].As<v8::Function>());
 
+  uv_loop_t* loop = uv_default_loop();
   int state = promise->State();
   while (state == v8::Promise::kPending) {
-    uv_run(uv_default_loop(), UV_RUN_ONCE);
+    uv_run(loop, UV_RUN_ONCE);
     tickCallback.Call(0, 0);
     state = promise->State();
   }

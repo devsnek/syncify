@@ -1,6 +1,6 @@
 {
   "name": "@snek/syncify",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "description": "a small and fast syncification library",
   "author": "snek <me@gus.host>",
@@ -8,7 +8,7 @@
   "homepage": "https://github.com/devsnek/syncify#readme",
   "scripts": {
     "install": "node-gyp rebuild",
-    "test": "jest"
+    "test": "node test.js"
   },
   "gypfile": true,
   "dependencies": {

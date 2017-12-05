@@ -2,18 +2,17 @@
 
 (this is not something you should use in prod)
 
-```js
+```javascript
 const syncify = require('@snek/syncify');
 
 const p0 = new Promise((r) => {
   setTimeout(() => r('works'), 1000);
 });
 
-// logs `'works'`
-console.log(syncify(p0));
+// blocks for 1000ms
+console.log(syncify(p0)); // 'works!'
 
 const p1 = Promise.reject(new Error('aaaa'));
 
-// throws
-syncify(p1);
+syncify(p1); // Error: 'aaaa'
 ```

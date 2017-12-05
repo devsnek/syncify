@@ -15,19 +15,10 @@ tap.type(syncify, 'function', 'is a function');
   tap.ok(Date.now() - start >= 1000, 'waits for promise to resolve');
 }
 
-try {
-  const p = Promise.reject(new Error('x'));
-  p.catch(() => {}); // eslint-disable-line no-empty-function
-  syncify(p);
-  tap.fail('did not throw!');
-} catch (err) {
-  tap.pass('got expected error');
+{
+  const p = Promise.reject(new Error('this is an error'));
+  tap.throws(() => syncify(p, /this is an error/, 'throws when promise rejects'));
 }
-
-/*
-tap.throws(() => syncify(Promise.reject(new Error('this is an error'))),
-  'this is an error', 'throws when promise rejects');
-*/
 
 {
   const expected = fs.readFileSync('./package.json').toString();

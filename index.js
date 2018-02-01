@@ -2,7 +2,10 @@ const {
   loop,
   kRejected,
   isPromise,
+  setTickCallback,
 } = require('bindings')('syncify');
+
+setTickCallback(process._tickCallback);
 
 const noop = () => {}; // eslint-disable-line no-empty-function
 

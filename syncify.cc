@@ -3,6 +3,12 @@
 
 using namespace v8;
 
+Nan::Callback tickCallback;
+
+void SetTickCallback(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  tickCallback.SetFunction(info[0].As<v8::Function>());
+}
+
 void Loop(const Nan::FunctionCallbackInfo<Value>& info) {
   auto isolate = info.GetIsolate();
   
@@ -22,6 +28,7 @@ void Loop(const Nan::FunctionCallbackInfo<Value>& info) {
   while (state == Promise::kPending) {
     uv_run(loop, UV_RUN_ONCE);
     isolate->RunMicrotasks();
+    tickCallback.Call(0, 0);
     state = promise->State();
   }
 
@@ -43,6 +50,7 @@ void Init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
   NanSetProperty(exports, "kPending", Nan::New(v8::Promise::kPending));
   NanSetProperty(exports, "kFulfilled", Nan::New(v8::Promise::kFulfilled));
   NanSetProperty(exports, "kRejected", Nan::New(v8::Promise::kRejected));
+  Nan::SetMethod(exports, "setTickCallback", SetTickCallback);
 }
 
 NODE_MODULE(syncify, Init)

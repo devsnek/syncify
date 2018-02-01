@@ -1,6 +1,6 @@
 {
   "name": "@snek/syncify",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "index.js",
   "description": "a small and fast syncification library",
   "author": "snek <me@gus.host>",

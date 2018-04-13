@@ -1,7 +1,10 @@
+'use strict';
+
 const tap = require('tap');
 const syncify = require('.');
 const util = require('util');
 const fs = require('fs');
+
 const setTimeoutAsync = util.promisify(setTimeout);
 const readFileAsync = util.promisify(fs.readFile);
 
@@ -17,7 +20,7 @@ tap.type(syncify, 'function', 'is a function');
 
 {
   const p = Promise.reject(new Error('this is an error'));
-  tap.throws(() => syncify(p, /this is an error/, 'throws when promise rejects'));
+  tap.throws(() => syncify(p), /this is an error/, 'throws when promise rejects');
 }
 
 {

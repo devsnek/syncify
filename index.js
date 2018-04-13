@@ -1,8 +1,10 @@
+'use strict';
+
 const {
   loop,
   kRejected,
-  isPromise,
   setTickCallback,
+  isPromise,
 } = require('bindings')('syncify');
 
 setTickCallback(process._tickCallback);

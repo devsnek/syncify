@@ -1,70 +1,75 @@
-#include <node.h>
+#include "napi.h"
 #include <v8.h>
 #include <uv.h>
 
-using namespace v8;
+using namespace Napi;
 
-template <typename T> inline void USE(T&&) {};
+FunctionReference tickCallback;
 
-Global<Function> tickCallback;
-
-void SetTickCallback(const FunctionCallbackInfo<Value>& info) {
-  Isolate* isolate = info.GetIsolate();
-  tickCallback.Reset(isolate, info[0].As<Function>());
+void SetTickCallback(const CallbackInfo& args) {
+  tickCallback = Persistent(args[0].As<Function>());
 }
 
-void Loop(const FunctionCallbackInfo<Value>& info) {
-  Isolate* isolate = info.GetIsolate();
-  Local<Context> context = isolate->GetCurrentContext();
+static napi_value JsValueFromV8LocalValue(v8::Local<v8::Value> local) {
+  return reinterpret_cast<napi_value>(*local);
+}
 
-  Local<Array> ret = Array::New(isolate, 2);
-  info.GetReturnValue().Set(ret);
+static v8::Local<v8::Value> V8LocalValueFromJsValue(napi_value v) {
+  v8::Local<v8::Value> local;
+  memcpy(&local, &v, sizeof(v));
+  return local;
+}
 
-  if (!info[0]->IsPromise()) {
-    USE(ret->Set(context, 0, Integer::New(isolate, Promise::kFulfilled)));
-    USE(ret->Set(context, 1, info[0]));
-    return;
+static Value Loop(const CallbackInfo& args) {
+  Env env = args.Env();
+
+  Array ret = Array::New(env, 2);
+  int32_t state_index = 0;
+  int32_t result_index = 1;
+
+  if (!args[0].IsPromise()) {
+    ret[state_index] = Number::New(env, v8::Promise::kFulfilled);
+    ret[result_index] = args[0];
+    return ret;
   }
 
-  Local<Promise> promise = info[0].As<Promise>();
-  Local<Function> cb = tickCallback.Get(isolate);
-  Local<Value> undefined = Undefined(isolate);
-  Local<Value> args[] = {};
+  v8::Local<v8::Promise> promise =
+    V8LocalValueFromJsValue(args[0]).As<v8::Promise>();
+
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
 
   uv_loop_t* loop = uv_default_loop();
   int state = promise->State();
-  while (state == Promise::kPending) {
+  while (state == v8::Promise::kPending) {
     uv_run(loop, UV_RUN_ONCE);
     isolate->RunMicrotasks();
-    USE(cb->Call(context, undefined, 0, args));
+    tickCallback({});
     state = promise->State();
   }
 
-  USE(ret->Set(context, 0, Integer::New(isolate, state)));
-  USE(ret->Set(context, 1, promise->Result()));
+  ret[state_index] = Number::New(env, state);
+  ret[result_index] = JsValueFromV8LocalValue(promise->Result());
+
+  return ret;
 }
 
-void IsPromise(const FunctionCallbackInfo<Value>& info) {
-  info.GetReturnValue().Set(info[0]->IsPromise());
+static Value IsPromise(const CallbackInfo& args) {
+  return Boolean::New(args.Env(), args[0].IsPromise());
 }
 
-void Init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
-  Isolate* isolate = Isolate::GetCurrent();
-  Local<Context> context = isolate->GetCurrentContext();
-
-#define V(name, fn) \
-  USE(exports->Set(context, String::NewFromUtf8(isolate, name), FunctionTemplate::New(isolate, fn)->GetFunction()))
-  V("loop", Loop);
-  V("setTickCallback", SetTickCallback);
-  V("isPromise", IsPromise);
-#undef V
+static Object Init(Env env, Object exports) {
+  exports["loop"] = Function::New(env, Loop);
+  exports["setTickCallback"] = Function::New(env, SetTickCallback);
+  exports["isPromise"] = Function::New(env, IsPromise);
 
 #define V(name) \
-  USE(exports->Set(context, String::NewFromUtf8(isolate, #name), Integer::New(isolate, v8::Promise::name)))
+  exports[#name] = Number::New(env, v8::Promise::name);
   V(kPending);
   V(kFulfilled);
   V(kRejected);
 #undef V
+
+  return exports;
 }
 
-NODE_MODULE(syncify, Init)
+NODE_API_MODULE(syncify, Init);
